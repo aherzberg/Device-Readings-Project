@@ -1,0 +1,84 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Device Readings Interview Project
+paths:
+  /devices/{id}/readings:
+    post:
+      description: Saves readings for given device UUID. Note this is saved in memory and so data is not persistent
+      parameters:
+        - description: UUID of device. Must Adhere to UUID format.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - description: | 
+            Array of readings. Requires at at least one reading in array. Array must adhere to the following format
+            ```json
+            readings: [
+              {
+                timestamp: string,
+                count: integer
+              }
+            ]            
+            ```
+            Timestamp must be ISO-8061 timestamp.
+          in: query
+          name: readings
+          required: true
+          schema:
+            type: array
+      responses:
+        '204':
+          description: No Content
+        '422':
+          content:
+            application/json:
+              example:
+                errors:
+                  - malformed_input: ["Bad UUID", "No Readings"]
+          schema:
+            type: object
+          description: Unprocessable Entity
+      summary: /devices/{id}/readings
+  /devices/{id}/readings/latest:
+    get:
+      description: Returns most recent timestamp for a given device.
+      parameters:
+        - description: UUID of device. Must Adhere to UUID format.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                latest_timestamp: 2021-09-29T16:08:15+01:00
+              schema:
+                type: object
+          description: OK
+      summary: /devices/{id}/readings/latest
+  /devices/{id}/readings/sum:
+    get:
+      description: Returns the sum of all readings for a given device.
+      parameters:
+        - description: UUID of device. Must Adhere to UUID format.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                cumulative_count: 4
+              schema:
+                type: object
+          description: OK
+      summary: /devices/{id}/readings/sum
